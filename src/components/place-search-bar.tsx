@@ -14,7 +14,7 @@ export default function PlaceSearchBar() {
     const [inputText, setInputText] = useState("");
     const fetchSuggestions = async () => {
         try {
-            //APIを呼び出す
+            const response = await fetch("/api/restaurant?input=");
         } catch (error) {
             console.error(error);
         }
