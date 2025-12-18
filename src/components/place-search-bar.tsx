@@ -8,15 +8,36 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { v4 as uuidv4 } from "uuid";
 
 export default function PlaceSearchBar() {
     const [open, setOpen] = useState(false);
     const [inputText, setInputText] = useState("");
-    const fetchSuggestions = async () => {
+    const [sessionToken, setSessionToken] = useState(uuidv4());
+
+    const fetchSuggestions = useDebouncedCallback(async (input: string) => {
+        if (!input.trim()) {
+            return;
+        }
         try {
-            const response = await fetch("/api/restaurant?input=");
+            const response = await fetch(
+                `/api/restaurant/autocomplete?input=${input}&sessionToken=${sessionToken}`
+            );
+            //TODO:ここのレスポンスを使ってサジェストを更新処理を実装していく
+            console.log("input:", input);
+            console.log("response status:", response.status);
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching suggestions:", error);
+        }
+    }, 500);
+
+    const handleBlur = () => {
+        setOpen(false);
+    };
+    const handleFocus = () => {
+        if (inputText.trim()) {
+            setOpen(true);
         }
     };
 
@@ -26,17 +47,9 @@ export default function PlaceSearchBar() {
             return;
         }
         setOpen(true);
-        fetchSuggestions();
-    }, [inputText]);
+        fetchSuggestions(inputText);
+    }, [inputText, fetchSuggestions]);
 
-    const handleBlur = () => {
-        setOpen(false);
-    };
-    const handleFocus = () => {
-        if (!inputText.trim()) {
-            setOpen(true);
-        }
-    };
     return (
         <Command className="overflow-visible bg-muted" shouldFilter={false}>
             <CommandInput
