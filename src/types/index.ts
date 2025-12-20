@@ -22,3 +22,34 @@ export interface PlaceSearchResult {
 export interface PlacePhoto {
     name?: string;
 }
+
+export interface GoogleplacesAutocompleteApiResponse {
+    suggestions?: PlaceAutocompleteResult[];
+}
+
+export interface PlaceAutocompleteResult {
+    placePrediction?: {
+        place?: string;
+        placeId?: string;
+        structuredFormat?: {
+            mainText?: {
+                text?: string;
+            };
+        };
+    };
+    queryPrediction?: {
+        text?: {
+            text?: string;
+        };
+    };
+}
+
+export type RestaurantSuggestion =
+    | {
+          type: "placePrediction";
+          placeId: string;
+      }
+    | {
+          type: "queryPrediction";
+          placeName: string;
+      };
