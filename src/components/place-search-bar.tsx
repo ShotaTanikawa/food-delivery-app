@@ -73,6 +73,23 @@ export default function PlaceSearchBar() {
     }, 500);
 
     /**
+     * 入力テキストが変更されたときにサジェストを取得
+     */
+    useEffect(() => {
+        // 空入力の場合はサジェストを非表示にしてクリア
+        if (!inputText.trim()) {
+            setOpen(false);
+            setSuggestions([]);
+            return;
+        }
+        // ローディング状態にしてサジェストリストを表示
+        setIsLoading(true);
+        setOpen(true);
+        // デバウンスされたfetchSuggestionsを呼び出し
+        fetchSuggestions(inputText);
+    }, [inputText, fetchSuggestions]);
+
+    /**
      * 入力フィールドからフォーカスが外れたときの処理
      * サジェストアイテムがクリックされた場合は閉じない（ナビゲーションを実行するため）
      */
@@ -93,23 +110,6 @@ export default function PlaceSearchBar() {
             setOpen(true);
         }
     };
-
-    /**
-     * 入力テキストが変更されたときにサジェストを取得
-     */
-    useEffect(() => {
-        // 空入力の場合はサジェストを非表示にしてクリア
-        if (!inputText.trim()) {
-            setOpen(false);
-            setSuggestions([]);
-            return;
-        }
-        // ローディング状態にしてサジェストリストを表示
-        setIsLoading(true);
-        setOpen(true);
-        // デバウンスされたfetchSuggestionsを呼び出し
-        fetchSuggestions(inputText);
-    }, [inputText, fetchSuggestions]);
 
     /**
      * サジェストアイテムが選択されたときの処理

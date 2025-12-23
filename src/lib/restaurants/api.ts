@@ -1,4 +1,8 @@
-import { GoogleplacesSearchApiResponse } from "@/types";
+import {
+    GooglePlaceDetailsApiResponse,
+    GoogleplacesSearchApiResponse,
+    PlaceDetaisAll,
+} from "@/types";
 import { transformPlaceResults } from "./utils";
 
 /**
@@ -321,4 +325,60 @@ export async function getPhotoUrl(name: string, maxWidthPx = 400) {
     // Google Places APIの写真メディアエンドポイント
     const url = `https://places.googleapis.com/v1/${name}/media?key=${apiKey}&maxWidthPx=${maxWidthPx}`;
     return url;
+}
+
+export async function getPlaceDetails(
+    placeId: string,
+    fields: string[],
+    sessionToken?: string
+) {
+    console.log("getPlaceDetails:", placeId, fields, sessionToken);
+
+    const fieldParam = fields.join(",");
+
+    let url: string;
+
+    if (sessionToken) {
+        url = `https://places.googleapis.com/v1/places/${placeId}?sessionToken=${sessionToken}&languageCode=ja`;
+    } else {
+        url = `https://places.googleapis.com/v1/places/${placeId}?languageCode=ja`;
+    }
+
+    const apiKey = process.env.GOOGLE_API_KEY;
+
+    // APIリクエストヘッダー
+    const header = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey!,
+        "X-Goog-FieldMask": fieldParam,
+    };
+
+    // Google Places APIにリクエスト送信
+    const response = await fetch(url, {
+        method: "GET",
+        headers: header,
+        next: { revalidate: 86400 }, // 24時間ごとに再検証（キャッシュ戦略）
+    });
+
+    // エラーハンドリング
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData);
+
+        return {
+            error: `Place detailsリクエストに失敗しました。ステータスコード: ${response.status}`,
+        };
+    }
+
+    // レスポンスをパース
+    const data: GooglePlaceDetailsApiResponse = await response.json();
+    console.log("getPlaceDetails response:", data);
+
+    const results: PlaceDetaisAll = {};
+
+    if (fields.includes("location") && data.location) {
+        results.location = data.location;
+    }
+
+    return { data: results };
 }

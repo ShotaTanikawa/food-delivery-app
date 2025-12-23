@@ -55,6 +55,9 @@ export interface PlaceAutocompleteResult {
             mainText?: {
                 text?: string; // 表示名（例: "ラーメン荘 歴史を刻め 世田谷"）
             };
+            secondaryText?: {
+                text?: string; // 表示名（例: "ラーメン荘 歴史を刻め 世田谷"）
+            };
         };
     };
     // 検索クエリの予測（特定の場所ではない）
@@ -73,4 +76,18 @@ export interface RestaurantSuggestion {
     type: string; // "placePrediction" または "queryPrediction"
     placeId?: string; // 場所ID（placePredictionの場合のみ存在）
     placeName: string; // 表示名またはクエリテキスト
+}
+
+export interface AddressSuggestion {
+    placeId: string;
+    placeName: string;
+    address_text: string;
+}
+
+export interface GooglePlaceDetailsApiResponse {
+    location?: { latitude?: number; longitude?: number };
+}
+
+export interface PlaceDetaisAll {
+    location?: { latitude?: number; longitude?: number };
 }

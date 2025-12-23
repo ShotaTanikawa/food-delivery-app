@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MenuSheet from "./menu-sheet";
 import PlaceSearchBar from "./place-search-bar";
+import AddressModal from "./address-modal";
 
 export default function Header() {
     return (
@@ -10,7 +11,7 @@ export default function Header() {
                 <div className="font-bold">
                     <Link href={"/"}>Delivery APP</Link>
                 </div>
-                <div>住所を検索</div>
+                <AddressModal />
                 <div className="flex-1">
                     <PlaceSearchBar />
                 </div>
