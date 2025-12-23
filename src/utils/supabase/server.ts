@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { Database } from "../../../database.types";
 
 /**
  * Server ComponentやRoute Handler用のSupabaseクライアントを作成
@@ -9,7 +10,7 @@ export async function createClient() {
     // Next.jsのCookieストアを取得
     const cookieStore = await cookies();
 
-    return createServerClient(
+    return createServerClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
         {
