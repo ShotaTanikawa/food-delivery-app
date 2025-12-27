@@ -10,21 +10,18 @@ import {
 } from "@/components/ui/dialog";
 import {
     Command,
-    CommandDialog,
     CommandEmpty,
-    CommandGroup,
     CommandInput,
     CommandItem,
     CommandList,
-    CommandSeparator,
-    CommandShortcut,
 } from "@/components/ui/command";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
-import { AddressSuggestion } from "@/types";
+import { Address, AddressResponse, AddressSuggestion } from "@/types";
 import { AlertCircle, LoaderCircle, MapPin } from "lucide-react";
 import { selectSuggestionAction } from "@/app/(private)/actions/addressActions";
+import useSWR, { mutate } from "swr";
 
 /**
  * 住所選択モーダルコンポーネント
@@ -100,6 +97,18 @@ export default function AddressModal() {
         fetchSuggestions(inputText);
     }, [inputText, fetchSuggestions]);
 
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+    const {
+        data,
+        error,
+        isLoading: loading,
+        mutate,
+    } = useSWR<AddressResponse>(`/api/address`, fetcher);
+    console.log("swr_data", data);
+    if (error) return <div>failed to load</div>;
+    if (loading) return <div>loading...</div>;
+
     /**
      * サジェストアイテムが選択されたときの処理
      * Server Actionを呼び出して住所情報を取得し、アプリケーションに登録する
@@ -115,6 +124,8 @@ export default function AddressModal() {
             // セッショントークンをリセット（次の検索で新しいセッションとして扱う）
             // これにより、Google Places APIの課金が正しく管理される
             setSessionToken(uuidv4());
+            setInputText("");
+            mutate();
         } catch (error) {
             console.error(error);
             // エラーが発生した場合はユーザーに通知
@@ -200,16 +211,20 @@ export default function AddressModal() {
                                 <h3 className="text-lg font-bold mb-2">
                                     保存済みの住所
                                 </h3>
-                                {/* TODO: 保存済み住所のリストを実装 */}
-                                <CommandItem className="p-5">
-                                    Calendar
-                                </CommandItem>
-                                <CommandItem className="p-5">
-                                    Search Emoji
-                                </CommandItem>
-                                <CommandItem className="p-5">
-                                    Calculator
-                                </CommandItem>
+
+                                {data?.addressList.map((address) => (
+                                    <CommandItem
+                                        key={address.id}
+                                        className="p-5"
+                                    >
+                                        <div>
+                                            <p className="font-bold">
+                                                {address.name}
+                                            </p>
+                                            <p>{address.address_text}</p>
+                                        </div>
+                                    </CommandItem>
+                                ))}
                             </>
                         )}
                     </CommandList>

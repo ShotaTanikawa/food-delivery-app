@@ -2,6 +2,8 @@
 
 import { getPlaceDetails } from "@/lib/restaurants/api";
 import { AddressSuggestion } from "@/types";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 /**
  * 住所サジェストが選択されたときに実行されるServer Action
@@ -13,6 +15,7 @@ export async function selectSuggestionAction(
     suggestion: AddressSuggestion,
     sessionToken: string
 ) {
+    const supabase = await createClient();
     console.log("server_action_suggestion:", suggestion);
 
     // Google Places APIから場所の詳細情報を取得
@@ -36,5 +39,43 @@ export async function selectSuggestionAction(
         // エラーが発生した場合、例外をスローしてクライアント側でエラーハンドリング
         throw new Error("住所情報の取得に失敗しました。");
     }
-    // TODO: 取得した住所情報をデータベース（Supabase）に保存する処理を実装
+
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        redirect("/login");
+    }
+
+    // データベース（Supabase）に住所情報を保存
+    const { data: newAddress, error: insertError } = await supabase
+        .from("addresses")
+        .insert({
+            name: suggestion.placeName,
+            address_text: suggestion.address_text,
+            latitude: locationData.location.latitude,
+            longitude: locationData.location.longitude,
+            user_id: user.id,
+        })
+        .select("id")
+        .single();
+
+    if (insertError) {
+        console.error("住所情報の保存に失敗しました。", insertError);
+        throw new Error("住所情報の保存に失敗しました。");
+    }
+
+    const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+            selected_address_id: newAddress.id,
+        })
+        .eq("id", user.id);
+
+    if (updateError) {
+        console.error("プロフィール情報の更新に失敗しました。", updateError);
+        throw new Error("プロフィール情報の更新に失敗しました。");
+    }
 }

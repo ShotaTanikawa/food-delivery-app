@@ -91,3 +91,16 @@ export interface GooglePlaceDetailsApiResponse {
 export interface PlaceDetaisAll {
     location?: { latitude?: number; longitude?: number };
 }
+
+export interface Address {
+    id: number;
+    name: string;
+    address_text: string;
+    latitude: number;
+    longitude: number;
+}
+
+export interface AddressResponse {
+    addressList: Address[];
+    selectedAddress: Address;
+}
