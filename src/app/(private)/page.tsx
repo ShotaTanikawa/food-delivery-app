@@ -3,20 +3,31 @@ import Categories from "@/components/categories";
 import RestaurantCard from "@/components/restaurant-card";
 import RestaurantList from "@/components/restaurant-list";
 import Section from "@/components/section";
-import { fetchRamenRestaurants, fetchRestaurants } from "@/lib/restaurants/api";
+import {
+    fetchLocation,
+    fetchRamenRestaurants,
+    fetchRestaurants,
+} from "@/lib/restaurants/api";
 
 /**
  * ホームページ（Server Component）
- * 渋谷周辺のレストランとラーメン店を表示
+ * ユーザーが選択した住所を中心とした周辺のレストランとラーメン店を表示
+ * 住所が選択されていない場合は、デフォルト位置（渋谷）を中心に検索する
  */
 export default async function Home() {
-    // 近くのラーメン店を取得
-    const { data: nearbyRamenRestaurants, error: nearbyRamenRestaurantsError } =
-        await fetchRamenRestaurants();
+    // 現在選択されている住所の緯度・経度を取得
+    // これがレストラン検索の中心位置として使用される
+    const { lat, lng } = await fetchLocation();
 
-    // 近くのレストランを取得
+    // 指定された位置周辺の近くのラーメン店を取得
+    // fetchRamenRestaurants関数に緯度・経度を渡して、位置に基づいた検索を実行
+    const { data: nearbyRamenRestaurants, error: nearbyRamenRestaurantsError } =
+        await fetchRamenRestaurants(lat, lng);
+
+    // 指定された位置周辺の近くのレストランを取得
+    // fetchRestaurants関数に緯度・経度を渡して、位置に基づいた検索を実行
     const { data: nearByRestaurants, error: nearByRestaurantsError } =
-        await fetchRestaurants();
+        await fetchRestaurants(lat, lng);
 
     return (
         <>

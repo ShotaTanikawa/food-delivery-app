@@ -78,29 +78,52 @@ export interface RestaurantSuggestion {
     placeName: string; // 表示名またはクエリテキスト
 }
 
+/**
+ * 住所検索のサジェスト結果の型
+ * API Route Handlerで変換後の形式
+ */
 export interface AddressSuggestion {
-    placeId: string;
-    placeName: string;
-    address_text: string;
+    placeId: string; // 場所の一意ID
+    placeName: string; // 場所名（例: "ラーメン荘 歴史を刻め 世田谷"）
+    address_text: string; // 住所テキスト（例: "東京都世田谷区..."）
 }
 
+/**
+ * Google Places API (Place Details) のレスポンス型
+ * 場所の詳細情報（緯度・経度など）を含む
+ */
 export interface GooglePlaceDetailsApiResponse {
-    location?: { latitude?: number; longitude?: number };
+    location?: {
+        latitude?: number; // 緯度
+        longitude?: number; // 経度
+    };
 }
 
+/**
+ * 場所の詳細情報の型（すべてのフィールドを含む場合用）
+ */
 export interface PlaceDetaisAll {
-    location?: { latitude?: number; longitude?: number };
+    location?: {
+        latitude?: number; // 緯度
+        longitude?: number; // 経度
+    };
 }
 
+/**
+ * データベースに保存された住所情報の型
+ */
 export interface Address {
-    id: number;
-    name: string;
-    address_text: string;
-    latitude: number;
-    longitude: number;
+    id: number; // 住所の一意ID
+    name: string; // 住所名（場所名）
+    address_text: string; // 住所テキスト
+    latitude: number; // 緯度
+    longitude: number; // 経度
 }
 
+/**
+ * 住所情報APIのレスポンス型
+ */
 export interface AddressResponse {
-    addressList: Address[];
-    selectedAddress: Address;
+    addressList: Address[]; // ユーザーが登録したすべての住所一覧
+    selectedAddress: Address; // 現在選択中の住所
 }

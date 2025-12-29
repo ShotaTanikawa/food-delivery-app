@@ -14,11 +14,16 @@ import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 
+interface PlaceSearchBarProps {
+    lat: number;
+    lng: number;
+}
+
 /**
  * レストラン検索バーコンポーネント
  * ユーザーの入力に基づいてGoogle Places APIを使用してレストラン検索のサジェストを表示
  */
-export default function PlaceSearchBar() {
+export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
     // サジェストリストの表示/非表示を管理
     const [open, setOpen] = useState(false);
     // 検索入力テキスト
@@ -50,7 +55,7 @@ export default function PlaceSearchBar() {
         try {
             // オートコンプリートAPIを呼び出し
             const response = await fetch(
-                `/api/restaurant/autocomplete?input=${input}&sessionToken=${sessionToken}`
+                `/api/restaurant/autocomplete?input=${input}&sessionToken=${sessionToken}&lat=${lat}&lng=${lng}`
             );
 
             // エラーレスポンスの処理
@@ -62,7 +67,6 @@ export default function PlaceSearchBar() {
 
             // レスポンスをパースしてサジェストリストを更新
             const data: RestaurantSuggestion[] = await response.json();
-            console.log("suggestions:", JSON.stringify(data, null, 2));
             setSuggestions(data);
         } catch (error) {
             console.error("Error fetching suggestions:", error);
@@ -117,8 +121,6 @@ export default function PlaceSearchBar() {
      * queryPrediction: 検索結果ページに遷移
      */
     const handleSelectSuggestion = (suggestion: RestaurantSuggestion) => {
-        console.log("suggestion:", suggestion);
-
         if (suggestion.type === "placePrediction") {
             // 特定のレストランページに遷移（placeIdを使用）
             router.push(

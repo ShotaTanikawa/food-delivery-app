@@ -11,9 +11,11 @@ import { NextRequest, NextResponse } from "next/server";
  * レストラン検索とは異なり、特定の場所（placePrediction）のみを返す
  */
 export async function GET(request: NextRequest) {
-    // クエリパラメータから検索入力とセッショントークンを取得
+    // クエリパラメータから検索入力、セッショントークン、緯度・経度を取得
     const searchParams = request.nextUrl.searchParams;
     const input = searchParams.get("input");
+    const latParam = searchParams.get("lat");
+    const lngParam = searchParams.get("lng");
     const sessionToken = searchParams.get("sessionToken");
 
     // 入力値のバリデーション
@@ -43,6 +45,10 @@ export async function GET(request: NextRequest) {
             "X-Goog-Api-Key": apiKey!,
         };
 
+        // 緯度・経度を数値に変換（指定されていない場合はデフォルト値（渋谷）を使用）
+        const lat = latParam ? parseFloat(latParam) : 35.6669248; // デフォルト: 渋谷の緯度
+        const lng = lngParam ? parseFloat(lngParam) : 139.6514163; // デフォルト: 渋谷の経度
+
         // Google Places APIへのリクエストボディ
         // 住所検索なので、クエリ予測（queryPrediction）は含めず、特定の場所（placePrediction）のみを取得
         const requestBody = {
@@ -51,13 +57,14 @@ export async function GET(request: NextRequest) {
             input: input, // ユーザーの検索入力
             // includedPrimaryTypes: ["restaurant"], // レストランのみに限定（住所検索では不要なためコメントアウト）
             locationBias: {
-                // 位置バイアス：渋谷周辺500m以内を優先（検索結果の精度向上のため）
+                // 位置バイアス：指定された緯度経度（またはデフォルト位置）を中心とした半径1000m以内を優先
+                // 検索結果の精度向上のため、ユーザーが選択した住所周辺の結果を優先的に表示
                 circle: {
                     center: {
-                        latitude: 35.6669248, // 渋谷の緯度
-                        longitude: 139.6514163, // 渋谷の経度
+                        latitude: lat, // 検索の中心となる緯度（ユーザーが選択した住所の緯度、またはデフォルト値）
+                        longitude: lng, // 検索の中心となる経度（ユーザーが選択した住所の経度、またはデフォルト値）
                     },
-                    radius: 500.0, // 半径500m
+                    radius: 1000.0, // 半径1000m
                 },
             },
             languageCode: "ja", // 日本語
@@ -87,7 +94,6 @@ export async function GET(request: NextRequest) {
 
         // レスポンスをパース
         const data: GoogleplacesAutocompleteApiResponse = await response.json();
-        console.log("data:", JSON.stringify(data, null, 2));
 
         const suggesions = data.suggestions ?? [];
 
@@ -112,8 +118,6 @@ export async function GET(request: NextRequest) {
                     !!suggestion.placeName &&
                     !!suggestion.address_text
             );
-
-        console.log("results:", JSON.stringify(results, null, 2));
 
         // 変換されたサジェスト結果を返す
         return NextResponse.json(results);
