@@ -20,7 +20,10 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
     return (
         <div className="relative">
             {/* レストラン詳細ページへのリンク（現在は#に設定） */}
-            <Link href={"#"} className="inset-0 absolute z-10"></Link>
+            <Link
+                href={`/restaurant/${restaurant.id}`}
+                className="inset-0 absolute z-10"
+            ></Link>
             {/* レストランの写真を表示 */}
             <div className="relative aspect-video rounded-lg overflow-hidden">
                 <Image

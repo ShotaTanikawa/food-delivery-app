@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      menus: {
+        Row: {
+          category: string
+          genre: string
+          id: number
+          image_path: string
+          is_featured: boolean
+          name: string
+          price: number
+        }
+        Insert: {
+          category: string
+          genre: string
+          id?: number
+          image_path: string
+          is_featured: boolean
+          name: string
+          price: number
+        }
+        Update: {
+          category?: string
+          genre?: string
+          id?: number
+          image_path?: string
+          is_featured?: boolean
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

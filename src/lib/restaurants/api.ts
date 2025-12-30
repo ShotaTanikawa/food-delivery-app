@@ -396,6 +396,7 @@ export async function getPlaceDetails(
 
     // レスポンスをパース
     const data: GooglePlaceDetailsApiResponse = await response.json();
+    console.log("getPlaceDetails response:", data);
 
     // 返却用の結果オブジェクトを初期化
     const results: PlaceDetaisAll = {};
@@ -405,6 +406,21 @@ export async function getPlaceDetails(
     if (fields.includes("location") && data.location) {
         results.location = data.location;
     }
+    if (fields.includes("displayName") && data.displayName?.text) {
+        results.displayName = data.displayName.text;
+    }
+    if (fields.includes("primaryType") && data.primaryType) {
+        results.primaryType = data.primaryType;
+    }
+    if (fields.includes("photos")) {
+        // results.photoUrl = data.photos?.[0]?.name
+        //     ? await getPhotoUrl(data.photos[0].name, 1200)
+        //     : "/no_image.png";
+
+        results.photoUrl = "/no_image.png"; // デフォルトの画像を設定
+    }
+
+    console.log("getPlaceDetails results:", results);
 
     // 取得した詳細情報を返す
     return { data: results };

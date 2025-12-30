@@ -97,6 +97,12 @@ export interface GooglePlaceDetailsApiResponse {
         latitude?: number; // 緯度
         longitude?: number; // 経度
     };
+    displayName?: {
+        languageCode?: string;
+        text?: string;
+    };
+    primaryType?: string;
+    photos?: PlacePhoto[];
 }
 
 /**
@@ -107,6 +113,9 @@ export interface PlaceDetaisAll {
         latitude?: number; // 緯度
         longitude?: number; // 経度
     };
+    displayName?: string;
+    primaryType?: string;
+    photoUrl?: string;
 }
 
 /**
@@ -126,4 +135,16 @@ export interface Address {
 export interface AddressResponse {
     addressList: Address[]; // ユーザーが登録したすべての住所一覧
     selectedAddress: Address; // 現在選択中の住所
+}
+
+export interface CategoryMenu {
+    categoryName: string;
+    id: string;
+    items: Menu[];
+}
+export interface Menu {
+    id: number;
+    name: string;
+    photoUrl: string;
+    price: number;
 }

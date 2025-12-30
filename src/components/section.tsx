@@ -37,10 +37,12 @@ export default function Section({
             {/* タイトルと展開ボタンのヘッダー */}
             <div className="flex items-center justify-between py-3">
                 <h2 className="text-2xl font-bold">{title}</h2>
-                <Button onClick={handleChange}>
-                    {/* 展開状態に応じてボタンのテキストを変更 */}
-                    {isExpanded ? "表示を戻す" : "すべて表示"}
-                </Button>
+                {expandedContent && (
+                    <Button onClick={handleChange}>
+                        {/* 展開状態に応じてボタンのテキストを変更 */}
+                        {isExpanded ? "表示を戻す" : "すべて表示"}
+                    </Button>
+                )}
             </div>
             {/* 展開状態に応じてコンテンツを切り替え */}
             {isExpanded ? expandedContent : children}
