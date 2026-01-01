@@ -137,14 +137,23 @@ export interface AddressResponse {
     selectedAddress: Address; // 現在選択中の住所
 }
 
+/**
+ * カテゴリー別に分類されたメニューの型
+ * レストランのメニューをカテゴリーごとにグループ化して管理するために使用
+ */
 export interface CategoryMenu {
-    categoryName: string;
-    id: string;
-    items: Menu[];
+    categoryName: string; // カテゴリーの表示名（例: "注目商品", "ラーメン", "サイドメニュー"）
+    id: string; // カテゴリーの一意ID（例: "featured", "ramen", "side"）
+    items: Menu[]; // このカテゴリーに属するメニューのリスト
 }
+
+/**
+ * メニューアイテムの型
+ * レストランの個々のメニュー項目の情報を表す
+ */
 export interface Menu {
-    id: number;
-    name: string;
-    photoUrl: string;
-    price: number;
+    id: number; // メニューの一意ID（データベースの主キー）
+    name: string; // メニュー名（例: "醤油ラーメン", "チャーシュー丼"）
+    photoUrl: string; // メニュー画像のURL（Supabase Storageの公開URL）
+    price: number; // メニューの価格（単位: 円）
 }
