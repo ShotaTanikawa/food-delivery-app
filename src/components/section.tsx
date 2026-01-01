@@ -8,12 +8,12 @@ import { Button } from "./ui/button";
  */
 interface SectionProps {
     children: React.ReactNode; // 通常表示されるコンテンツ（カルーセルなど）
-    title: string; // セクションのタイトル
+    title?: string; // セクションのタイトル
     expandedContent?: React.ReactNode; // 展開時に表示されるコンテンツ（レストランリストなど）
 }
 
 /**
- * セクションコンポーネント
+ * セクションコンポーネント（タイトルがない場合もある）
  * タイトルと展開/折りたたみ機能を持つセクションを表示
  * 展開ボタンをクリックすると、children（通常のコンテンツ）とexpandedContent（展開時のコンテンツ）が切り替わる
  */

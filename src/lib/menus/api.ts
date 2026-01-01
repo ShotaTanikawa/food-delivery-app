@@ -120,3 +120,34 @@ export async function fetchCategoryMenus(
     // 最初に注目商品、その後に各カテゴリーのメニューが順番に格納される
     return { data: categoryMenus };
 }
+
+export async function fetchMenus(primaryType: string) {
+    // Supabaseクライアントを作成（Server Component用）
+    const supabase = await createClient();
+    // Supabase Storageの"menus"バケットにアクセスするためのオブジェクトを取得
+    // メニュー画像の公開URLを取得するために使用する
+    const bucket = supabase.storage.from("menus");
+
+    const { data: menuItems, error: menuItemsError } = await supabase
+        .from("menus")
+        .select("*")
+        .eq("genre", primaryType);
+
+    if (menuItemsError) {
+        console.error("メニュー情報の取得に失敗しました:", menuItemsError);
+        return { error: "メニュー情報の取得に失敗しました" };
+    }
+
+    const menus = menuItems.map(
+        (menu): Menu => ({
+            id: menu.id, // メニューの一意ID
+            name: menu.name, // メニュー名
+            price: menu.price, // 価格
+            // Supabase Storageから画像の公開URLを取得
+            // image_pathを公開アクセス可能なURLに変換
+            photoUrl: bucket.getPublicUrl(menu.image_path).data.publicUrl,
+        })
+    );
+
+    return { data: menus };
+}
